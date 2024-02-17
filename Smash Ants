@@ -1,0 +1,113 @@
+#pgzero
+import random
+
+WIDTH = 600
+HEIGHT = 300
+TITLE = "Smash Ants"
+fps = 30
+
+background = Actor('planks1')
+cookie1 = Actor('coco',(300,150))
+# ant = Actor('ant')
+semut = []
+mode = 'game'
+darah = 1000
+point = 0
+
+def draw():
+    background.draw()
+    if mode == "game":
+        cookie1.draw()
+        screen.draw.text(str(darah), center=(30, 30), color = 'white', fontsize = 26)
+        screen.draw.text(str(point), center=(580, 10), color="white", fontsize = 30)
+        for i in range(len(semut)):
+            semut[i].draw()
+    if mode == "end":
+        background.draw()
+        screen.draw.text("Permainan berakhir", center=(300, 100), color = 'white', fontsize = 26)
+        screen.draw.text("Tekan space", center=(300, 200), color="white", fontsize = 24)
+
+count = random.randint(1, 8)
+for i in range(count):
+    x = random.randint(-100, 700)
+    y = random.randint(-100, 550)
+    enemy = Actor("ant", (x, y))
+    enemy.speed = random.randint(2, 5)
+    enemy.attack = random.randint(1, 2)
+    enemy.count = 0
+    semut.append(enemy)
+
+def new_enemy():
+    x = random.randint(-100, 700)
+    y = random.randint(-100, 550)
+    enemy = Actor("ant", (x, y))
+    enemy.speed = random.randint(2, 5)
+    enemy.attack = random.randint(1, 2)
+    enemy.count = 0
+    semut.append(enemy)
+
+def enemy_ant():
+    global darah
+    for i in range(len(semut)):
+        if semut[i].image == 'ant':
+            if semut[i].y < 150:
+                semut[i].y = semut[i].y + semut[i].speed
+            elif semut[i].y > 150:
+                semut[i].y = semut[i].y - semut[i].speed
+            if semut[i].x < 300:
+                semut[i].x = semut[i].x + semut[i].speed
+            elif semut[i].x > 300:
+                semut[i].x = semut[i].x - semut[i].speed
+            if cookie1.colliderect(semut[i]):
+                darah -= semut[i].attack
+        else:
+            semut[i].count += 1/FPS
+            if semut[i].count >= 1:
+                semut.pop(i)
+                break
+
+def on_mouse_down(button,pos):
+    global click
+    global point
+    if button == mouse.LEFT and mode == "game":
+        for i in range(len(semut)):
+            if semut[i].collidepoint(pos):
+                semut[i].image = "unalive"
+                point+= 1
+                new_enemy()
+                
+
+
+def update(dt):
+    global mode, darah, semut
+    global point
+    enemy_ant()
+    if darah <= 0:
+        cookie1.image = 'coco6'
+    if cookie1.image == 'coco6':
+        mode = "end"
+    elif darah <= 100:
+        cookie1.image = 'coco5'
+    elif darah <= 250:
+        cookie1.image = 'coco4'
+    elif darah <= 450:
+        cookie1.image = 'coco3'
+    elif darah <= 750:
+        cookie1.image = 'coco2'
+    elif darah <= 950:
+        cookie1.image = 'coco1'
+    if mode == "end" and keyboard.space:
+        darah = 1000
+        cookie1.image = 'coco'
+        semut = []
+        mode = "game"
+        point = 0
+        count = random.randint(1, 10)
+        for i in range(count):
+            x = random.randint(-100, 700)
+            y = random.randint(-100, 550)
+            enemy = Actor("ant", (x, y))
+            enemy.speed = random.randint(2, 8)
+            enemy.attack = random.randint(1, 2)
+            enemy.count = 0
+            semut.append(enemy)
